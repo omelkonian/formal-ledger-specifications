@@ -117,15 +117,14 @@ jobs:
           key: cache-store-${{ runner.os }}-${{github.run_id}}
 
       - name: Prepare pdf files to be deployed to site
-        if: github.ref == 'refs/heads/master'
         run: |
           mkdir -p pdfs
           for f in $(find -L outputs -name '*.pdf'); do
+            echo "PDF: $f"
             cp -L --force $f pdfs
           done
 
       - name: Prepare html docs to be deployed to site
-        if: github.ref =='refs/heads/master'
         id: html
         run: |
           mkdir -p html
@@ -137,7 +136,6 @@ jobs:
           echo "midnight=$midnight" >> $GITHUB_OUTPUT
 
       - name: Build static file
-        if: github.ref == 'refs/heads/master'
         run: |
               ledger="${{steps.html.outputs.ledger}}.PDF.html"
               midnight="${{steps.html.outputs.midnight}}.PDF.html"
@@ -161,19 +159,13 @@ jobs:
               EOF
 
       - name: Add files
-        if: github.ref == 'refs/heads/master'
-
         run: |
             git config user.name 'github-actions[bot]'
             git config user.email 'github-actions[bot]@users.noreply.github.com'
-            git add index.html
-            git add pdfs
-            git add html
+            git add -f index.html pdfs/ html/
             git commit -m "Updated for ${{ github.sha }}"
 
-
       - name: Push to gh-pages
-        if: github.ref == 'refs/heads/master'
         uses: ad-m/github-push-action@v0.6.0
         with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
