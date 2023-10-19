@@ -1,0 +1,97 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Ledger.Ledger</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Background">\section{Ledger State Transition}
+
+</a><a id="36" class="Markup">\begin{code}[hide]</a>
+<a id="55" class="Symbol">{-#</a> <a id="59" class="Keyword">OPTIONS</a> <a id="67" class="Pragma">--safe</a> <a id="74" class="Symbol">#-}</a>
+
+<a id="79" class="Keyword">import</a> <a id="86" href="Data.List.html" class="Module">Data.List</a> <a id="96" class="Symbol">as</a> <a id="99" class="Module">L</a>
+
+<a id="102" class="Keyword">open</a> <a id="107" class="Keyword">import</a> <a id="114" href="Ledger.Prelude.html" class="Module">Ledger.Prelude</a>
+<a id="129" class="Keyword">open</a> <a id="134" class="Keyword">import</a> <a id="141" href="Ledger.Abstract.html" class="Module">Ledger.Abstract</a>
+<a id="157" class="Keyword">open</a> <a id="162" class="Keyword">import</a> <a id="169" href="Ledger.Transaction.html" class="Module">Ledger.Transaction</a> <a id="188" class="Keyword">using</a> <a id="194" class="Symbol">(</a><a id="195" href="Ledger.Transaction.html#878" class="Record">TransactionStructure</a><a id="215" class="Symbol">)</a>
+
+<a id="218" class="Keyword">module</a> <a id="225" href="Ledger.Ledger.html" class="Module">Ledger.Ledger</a>
+  <a id="241" class="Symbol">(</a><a id="242" href="Ledger.Ledger.html#242" class="Bound">txs</a> <a id="246" class="Symbol">:</a> <a id="248" class="Symbol">_)</a> <a id="251" class="Symbol">(</a><a id="252" class="Keyword">open</a> <a id="257" href="Ledger.Transaction.html#878" class="Module">TransactionStructure</a> <a id="278" href="Ledger.Ledger.html#242" class="Bound">txs</a><a id="281" class="Symbol">)</a>
+  <a id="285" class="Symbol">(</a><a id="286" href="Ledger.Ledger.html#286" class="Bound">abs</a> <a id="290" class="Symbol">:</a> <a id="292" href="Ledger.Abstract.html#437" class="Record">AbstractFunctions</a> <a id="310" href="Ledger.Ledger.html#242" class="Bound">txs</a><a id="313" class="Symbol">)</a> <a id="315" class="Symbol">(</a><a id="316" class="Keyword">open</a> <a id="321" href="Ledger.Abstract.html#437" class="Module">AbstractFunctions</a> <a id="339" href="Ledger.Ledger.html#286" class="Bound">abs</a><a id="342" class="Symbol">)</a>
+  <a id="346" class="Keyword">where</a>
+
+<a id="353" class="Keyword">open</a> <a id="358" class="Keyword">import</a> <a id="365" href="Ledger.Gov.html" class="Module">Ledger.Gov</a> <a id="376" href="Ledger.Transaction.html#2730" class="Function">govStructure</a>
+<a id="389" class="Keyword">open</a> <a id="394" class="Keyword">import</a> <a id="401" href="Ledger.PPUp.html" class="Module">Ledger.PPUp</a> <a id="413" href="Ledger.Ledger.html#242" class="Bound">txs</a>
+<a id="417" class="Keyword">open</a> <a id="422" class="Keyword">import</a> <a id="429" href="Ledger.Utxo.html" class="Module">Ledger.Utxo</a> <a id="441" href="Ledger.Ledger.html#242" class="Bound">txs</a> <a id="445" href="Ledger.Ledger.html#286" class="Bound">abs</a>
+<a id="449" class="Keyword">open</a> <a id="454" class="Keyword">import</a> <a id="461" href="Ledger.Utxow.html" class="Module">Ledger.Utxow</a> <a id="474" href="Ledger.Ledger.html#242" class="Bound">txs</a> <a id="478" href="Ledger.Ledger.html#286" class="Bound">abs</a>
+
+<a id="483" class="Keyword">open</a> <a id="488" href="Ledger.Transaction.html#4647" class="Module">Tx</a>
+<a id="491" class="Markup">\end{code}</a><a id="501" class="Background">
+
+The entire state transformation of the ledger state caused by a valid
+transaction can now be given as a combination of the previously
+defined transition systems.
+
+\begin{figure*}[h]
+</a><a id="685" class="Markup">\begin{code}</a>
+<a id="698" class="Keyword">record</a> <a id="LEnv"></a><a id="705" href="Ledger.Ledger.html#705" class="Record">LEnv</a> <a id="710" class="Symbol">:</a> <a id="712" href="Agda.Primitive.html#320" class="Primitive">Set</a> <a id="716" class="Keyword">where</a>
+  <a id="724" class="Keyword">constructor</a> <a id="⟦_,_,_⟧ˡᵉ"></a><a id="736" href="Ledger.Ledger.html#736" class="InductiveConstructor Operator">⟦_,_,_⟧ˡᵉ</a>
+  <a id="748" class="Keyword">field</a> <a id="LEnv.slot"></a><a id="754" href="Ledger.Ledger.html#754" class="Field">slot</a>     <a id="763" class="Symbol">:</a> <a id="765" href="Ledger.Epoch.html#341" class="Function">Slot</a>
+        <a id="LEnv.ppolicy"></a><a id="778" href="Ledger.Ledger.html#778" class="Field">ppolicy</a>  <a id="787" class="Symbol">:</a> <a id="789" href="Agda.Builtin.Maybe.html#118" class="Datatype">Maybe</a> <a id="795" href="Ledger.Crypto.html#1595" class="Function">ScriptHash</a>
+        <a id="LEnv.pparams"></a><a id="814" href="Ledger.Ledger.html#814" class="Field">pparams</a>  <a id="823" class="Symbol">:</a> <a id="825" href="Ledger.PParams.html#1143" class="Record">PParams</a>
+
+<a id="834" class="Keyword">record</a> <a id="LState"></a><a id="841" href="Ledger.Ledger.html#841" class="Record">LState</a> <a id="848" class="Symbol">:</a> <a id="850" href="Agda.Primitive.html#320" class="Primitive">Set</a> <a id="854" class="Keyword">where</a>
+  <a id="862" class="Keyword">constructor</a> <a id="⟦_,_,_⟧ˡ"></a><a id="874" href="Ledger.Ledger.html#874" class="InductiveConstructor Operator">⟦_,_,_⟧ˡ</a>
+  <a id="885" class="Keyword">field</a> <a id="LState.utxoSt"></a><a id="891" href="Ledger.Ledger.html#891" class="Field">utxoSt</a>     <a id="902" class="Symbol">:</a> <a id="904" href="Ledger.Utxo.html#6028" class="Record">UTxOState</a>
+        <a id="LState.govSt"></a><a id="922" href="Ledger.Ledger.html#922" class="Field">govSt</a>      <a id="933" class="Symbol">:</a> <a id="935" href="Ledger.Gov.html#899" class="Function">GovState</a>
+        <a id="LState.certState"></a><a id="952" href="Ledger.Ledger.html#952" class="Field">certState</a>  <a id="963" class="Symbol">:</a> <a id="965" href="Ledger.Deleg.html#1259" class="Record">CertState</a>
+
+<a id="txgov"></a><a id="976" href="Ledger.Ledger.html#976" class="Function">txgov</a> <a id="982" class="Symbol">:</a> <a id="984" href="Ledger.Transaction.html#3692" class="Record">TxBody</a> <a id="991" class="Symbol">→</a> <a id="993" href="Agda.Builtin.List.html#130" class="Datatype">List</a> <a id="998" class="Symbol">(</a><a id="999" href="Ledger.GovernanceActions.html#8529" class="Record">GovVote</a> <a id="1007" href="Data.Sum.Base.html#616" class="Datatype Operator">⊎</a> <a id="1009" href="Ledger.GovernanceActions.html#8716" class="Record">GovProposal</a><a id="1020" class="Symbol">)</a>
+<a id="1022" href="Ledger.Ledger.html#976" class="Function">txgov</a> <a id="1028" href="Ledger.Ledger.html#1028" class="Bound">txb</a> <a id="1032" class="Symbol">=</a> <a id="1034" href="Interface.Functor.html#448" class="Function">map</a> <a id="1038" href="Data.Sum.Base.html#666" class="InductiveConstructor">inj₁</a> <a id="1043" href="Ledger.Transaction.html#3979" class="Field">txvote</a> <a id="1050" href="Data.List.Base.html#1929" class="Function Operator">++</a> <a id="1053" href="Interface.Functor.html#448" class="Function">map</a> <a id="1057" href="Data.Sum.Base.html#691" class="InductiveConstructor">inj₂</a> <a id="1062" href="Ledger.Transaction.html#4019" class="Field">txprop</a>
+  <a id="1071" class="Keyword">where</a> <a id="1077" class="Keyword">open</a> <a id="1082" href="Ledger.Transaction.html#3692" class="Module">TxBody</a> <a id="1089" href="Ledger.Ledger.html#1028" class="Bound">txb</a>
+
+<a id="1094" class="Markup">\end{code}</a><a id="1104" class="Background">
+\caption{Types and functions for the LEDGER transition system}
+\end{figure*}
+</a><a id="1182" class="Markup">\begin{code}[hide]</a>
+<a id="1201" class="Keyword">private</a> <a id="1209" class="Keyword">variable</a>
+  <a id="1220" href="Ledger.Ledger.html#1220" class="Generalizable">Γ</a> <a id="1222" class="Symbol">:</a> <a id="1224" href="Ledger.Ledger.html#705" class="Record">LEnv</a>
+  <a id="1231" href="Ledger.Ledger.html#1231" class="Generalizable">s</a> <a id="1233" href="Ledger.Ledger.html#1233" class="Generalizable">s&#39;</a> <a id="1236" href="Ledger.Ledger.html#1236" class="Generalizable">s&#39;&#39;</a> <a id="1240" class="Symbol">:</a> <a id="1242" href="Ledger.Ledger.html#841" class="Record">LState</a>
+  <a id="1251" href="Ledger.Ledger.html#1251" class="Generalizable">utxoSt&#39;</a> <a id="1259" class="Symbol">:</a> <a id="1261" href="Ledger.Utxo.html#6028" class="Record">UTxOState</a>
+  <a id="1273" href="Ledger.Ledger.html#1273" class="Generalizable">govSt&#39;</a> <a id="1280" class="Symbol">:</a> <a id="1282" href="Ledger.Gov.html#899" class="Function">GovState</a>
+  <a id="1293" href="Ledger.Ledger.html#1293" class="Generalizable">certState&#39;</a> <a id="1304" class="Symbol">:</a> <a id="1306" href="Ledger.Deleg.html#1259" class="Record">CertState</a>
+  <a id="1318" href="Ledger.Ledger.html#1318" class="Generalizable">tx</a> <a id="1321" class="Symbol">:</a> <a id="1323" href="Ledger.Transaction.html#4647" class="Record">Tx</a>
+<a id="1326" class="Markup">\end{code}</a><a id="1336" class="Background">
+
+\begin{figure*}[h]
+</a><a id="1357" class="Markup">\begin{code}[hide]</a>
+<a id="1376" class="Keyword">open</a> <a id="1381" href="Ledger.Address.html#1216" class="Module">RwdAddr</a>
+<a id="1389" class="Keyword">open</a> <a id="1394" href="Ledger.Deleg.html#815" class="Module">DState</a>
+<a id="1401" class="Keyword">open</a> <a id="1406" href="Ledger.Deleg.html#1259" class="Module">CertState</a>
+
+<a id="1417" class="Keyword">data</a>
+<a id="1422" class="Markup">\end{code}</a><a id="1432" class="Background">
+</a><a id="1433" class="Markup">\begin{code}</a>
+  <a id="_⊢_⇀⦇_,LEDGER⦈_"></a><a id="1448" href="Ledger.Ledger.html#1448" class="Datatype Operator">_⊢_⇀⦇_,LEDGER⦈_</a> <a id="1464" class="Symbol">:</a> <a id="1466" href="Ledger.Ledger.html#705" class="Record">LEnv</a> <a id="1471" class="Symbol">→</a> <a id="1473" href="Ledger.Ledger.html#841" class="Record">LState</a> <a id="1480" class="Symbol">→</a> <a id="1482" href="Ledger.Transaction.html#4647" class="Record">Tx</a> <a id="1485" class="Symbol">→</a> <a id="1487" href="Ledger.Ledger.html#841" class="Record">LState</a> <a id="1494" class="Symbol">→</a> <a id="1496" href="Agda.Primitive.html#320" class="Primitive">Set</a>
+<a id="1500" class="Markup">\end{code}</a><a id="1510" class="Background">
+</a><a id="1511" class="Markup">\begin{code}[hide]</a>
+  <a id="1532" class="Keyword">where</a>
+<a id="1538" class="Markup">\end{code}</a><a id="1548" class="Background">
+\caption{The type of the LEDGER transition system}
+\end{figure*}
+
+\begin{figure*}[h]
+</a><a id="1634" class="Markup">\begin{code}</a>
+  <a id="_⊢_⇀⦇_,LEDGER⦈_.LEDGER"></a><a id="1649" href="Ledger.Ledger.html#1649" class="InductiveConstructor">LEDGER</a> <a id="1656" class="Symbol">:</a> <a id="1658" class="Keyword">let</a> <a id="1662" class="Keyword">open</a> <a id="1667" href="Ledger.Ledger.html#841" class="Module">LState</a> <a id="1674" href="Ledger.Ledger.html#1231" class="Generalizable">s</a><a id="1675" class="Symbol">;</a> <a id="1677" href="Ledger.Ledger.html#1677" class="Bound">txb</a> <a id="1681" class="Symbol">=</a> <a id="1683" href="Ledger.Ledger.html#1318" class="Generalizable">tx</a> <a id="1686" class="Symbol">.</a><a id="1687" href="Ledger.Transaction.html#4672" class="Field">body</a><a id="1691" class="Symbol">;</a> <a id="1693" class="Keyword">open</a> <a id="1698" href="Ledger.Transaction.html#3692" class="Module">TxBody</a> <a id="1705" href="Ledger.Ledger.html#1677" class="Bound">txb</a><a id="1708" class="Symbol">;</a> <a id="1710" class="Keyword">open</a> <a id="1715" href="Ledger.Ledger.html#705" class="Module">LEnv</a> <a id="1720" href="Ledger.Ledger.html#1220" class="Generalizable">Γ</a> <a id="1722" class="Keyword">in</a>
+       <a id="1732" class="Keyword">record</a> <a id="1739" class="Symbol">{</a> <a id="1741" href="Ledger.Ledger.html#1741" class="Module">LEnv</a> <a id="1746" href="Ledger.Ledger.html#1220" class="Generalizable">Γ</a> <a id="1748" class="Symbol">}</a> <a id="1750" href="Ledger.Utxow.html#1216" class="Datatype Operator">⊢</a> <a id="1752" href="Ledger.Ledger.html#891" class="Function">utxoSt</a> <a id="1759" href="Ledger.Utxow.html#1216" class="Datatype Operator">⇀⦇</a> <a id="1762" href="Ledger.Ledger.html#1318" class="Generalizable">tx</a> <a id="1765" href="Ledger.Utxow.html#1216" class="Datatype Operator">,UTXOW⦈</a> <a id="1773" href="Ledger.Ledger.html#1251" class="Generalizable">utxoSt&#39;</a>
+    <a id="1785" class="Symbol">→</a>  <a id="1788" href="Ledger.Deleg.html#720" class="InductiveConstructor Operator">⟦</a> <a id="1790" href="Ledger.Epoch.html#477" class="Function">epoch</a> <a id="1796" href="Ledger.Ledger.html#754" class="Function">slot</a> <a id="1801" href="Ledger.Deleg.html#720" class="InductiveConstructor Operator">,</a> <a id="1803" href="Ledger.Ledger.html#814" class="Function">pparams</a> <a id="1811" href="Ledger.Deleg.html#720" class="InductiveConstructor Operator">,</a> <a id="1813" href="Ledger.Transaction.html#3979" class="Function">txvote</a> <a id="1820" href="Ledger.Deleg.html#720" class="InductiveConstructor Operator">⟧ᶜ</a> <a id="1823" href="Ledger.Deleg.html#5504" class="Function Operator">⊢</a> <a id="1825" href="Ledger.Ledger.html#952" class="Function">certState</a> <a id="1835" href="Ledger.Deleg.html#5504" class="Function Operator">⇀⦇</a> <a id="1838" href="Ledger.Transaction.html#3909" class="Function">txcerts</a> <a id="1846" href="Ledger.Deleg.html#5504" class="Function Operator">,CERTS⦈</a> <a id="1854" href="Ledger.Ledger.html#1293" class="Generalizable">certState&#39;</a>
+    <a id="1869" class="Symbol">→</a>  <a id="1872" href="Ledger.Gov.html#1002" class="InductiveConstructor Operator">⟦</a> <a id="1874" href="Ledger.Transaction.html#4245" class="Function">txid</a> <a id="1879" href="Ledger.Gov.html#1002" class="InductiveConstructor Operator">,</a> <a id="1881" href="Ledger.Epoch.html#477" class="Function">epoch</a> <a id="1887" href="Ledger.Ledger.html#754" class="Function">slot</a> <a id="1892" href="Ledger.Gov.html#1002" class="InductiveConstructor Operator">,</a> <a id="1894" href="Ledger.Ledger.html#814" class="Function">pparams</a> <a id="1902" href="Ledger.Gov.html#1002" class="InductiveConstructor Operator">⟧ᵗ</a> <a id="1905" href="Ledger.Gov.html#1261" class="Function Operator">⊢</a> <a id="1907" href="Ledger.Ledger.html#922" class="Function">govSt</a> <a id="1913" href="Ledger.Gov.html#1261" class="Function Operator">⇀⦇</a> <a id="1916" href="Ledger.Ledger.html#976" class="Function">txgov</a> <a id="1922" href="Ledger.Ledger.html#1677" class="Bound">txb</a> <a id="1926" href="Ledger.Gov.html#1261" class="Function Operator">,GOV⦈</a> <a id="1932" href="Ledger.Ledger.html#1273" class="Generalizable">govSt&#39;</a>
+    <a id="1943" class="Symbol">→</a>  <a id="1946" href="Ledger.Set.Theory.html#442" class="Function">mapˢ</a> <a id="1951" href="Ledger.Address.html#1269" class="Field">stake</a> <a id="1957" class="Symbol">(</a><a id="1958" href="Interface.IsSet.html#794" class="Function">dom</a> <a id="1962" href="Ledger.Transaction.html#3947" class="Function">txwdrls</a><a id="1969" class="Symbol">)</a> <a id="1971" href="Axiom.Set.html#1697" class="Function Operator">⊆</a> <a id="1973" href="Interface.IsSet.html#794" class="Function">dom</a> <a id="1977" class="Symbol">(</a><a id="1978" href="Ledger.Ledger.html#1293" class="Generalizable">certState&#39;</a> <a id="1989" class="Symbol">.</a><a id="1990" href="Ledger.Deleg.html#1312" class="Field">dState</a> <a id="1997" class="Symbol">.</a><a id="1998" href="Ledger.Deleg.html#869" class="Field">voteDelegs</a><a id="2008" class="Symbol">)</a>
+       <a id="2017" href="Interface.STS.html#244" class="Function Operator">────────────────────────────────</a>
+       <a id="2057" href="Ledger.Ledger.html#1220" class="Generalizable">Γ</a> <a id="2059" href="Ledger.Ledger.html#1448" class="Datatype Operator">⊢</a> <a id="2061" href="Ledger.Ledger.html#1231" class="Generalizable">s</a> <a id="2063" href="Ledger.Ledger.html#1448" class="Datatype Operator">⇀⦇</a> <a id="2066" href="Ledger.Ledger.html#1318" class="Generalizable">tx</a> <a id="2069" href="Ledger.Ledger.html#1448" class="Datatype Operator">,LEDGER⦈</a> <a id="2078" href="Ledger.Ledger.html#874" class="InductiveConstructor Operator">⟦</a> <a id="2080" href="Ledger.Ledger.html#1251" class="Generalizable">utxoSt&#39;</a> <a id="2088" href="Ledger.Ledger.html#874" class="InductiveConstructor Operator">,</a> <a id="2090" href="Ledger.Ledger.html#1273" class="Generalizable">govSt&#39;</a> <a id="2097" href="Ledger.Ledger.html#874" class="InductiveConstructor Operator">,</a> <a id="2099" href="Ledger.Ledger.html#1293" class="Generalizable">certState&#39;</a> <a id="2110" href="Ledger.Ledger.html#874" class="InductiveConstructor Operator">⟧ˡ</a>
+<a id="2113" class="Markup">\end{code}</a><a id="2123" class="Background">
+\caption{LEDGER transition system}
+\end{figure*}
+\begin{figure*}[h]
+</a><a id="2192" class="Markup">\begin{code}</a>
+<a id="_⊢_⇀⦇_,LEDGERS⦈_"></a><a id="2205" href="Ledger.Ledger.html#2205" class="Function Operator">_⊢_⇀⦇_,LEDGERS⦈_</a> <a id="2222" class="Symbol">:</a> <a id="2224" href="Ledger.Ledger.html#705" class="Record">LEnv</a> <a id="2229" class="Symbol">→</a> <a id="2231" href="Ledger.Ledger.html#841" class="Record">LState</a> <a id="2238" class="Symbol">→</a> <a id="2240" href="Agda.Builtin.List.html#130" class="Datatype">List</a> <a id="2245" href="Ledger.Transaction.html#4647" class="Record">Tx</a> <a id="2248" class="Symbol">→</a> <a id="2250" href="Ledger.Ledger.html#841" class="Record">LState</a> <a id="2257" class="Symbol">→</a> <a id="2259" href="Agda.Primitive.html#320" class="Primitive">Set</a>
+<a id="2263" href="Ledger.Ledger.html#2205" class="Function Operator">_⊢_⇀⦇_,LEDGERS⦈_</a> <a id="2280" class="Symbol">=</a> <a id="2282" href="Interface.STS.html#1607" class="Function">SS⇒BS</a> <a id="2288" href="Ledger.Ledger.html#1448" class="Datatype Operator">_⊢_⇀⦇_,LEDGER⦈_</a>
+<a id="2304" class="Markup">\end{code}</a><a id="2314" class="Background">
+\caption{LEDGERS transition system}
+\end{figure*}
+</a></pre></body></html>

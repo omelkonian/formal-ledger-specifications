@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Ledger.Prelude</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Symbol">{-#</a> <a id="5" class="Keyword">OPTIONS</a> <a id="13" class="Pragma">--safe</a> <a id="20" class="Symbol">#-}</a>
+
+<a id="25" class="Comment">--------------------------------------------------------------------------------</a>
+<a id="106" class="Comment">-- Ledger prelude</a>
+<a id="124" class="Comment">--</a>
+<a id="127" class="Comment">-- Re-exports modules relating to STS, set theory and other</a>
+<a id="187" class="Comment">-- miscellaneous things used to write the ledger rules. If something</a>
+<a id="256" class="Comment">-- is used in more than two Ledger.* modules, it should probably go</a>
+<a id="324" class="Comment">-- here.</a>
+<a id="333" class="Comment">--------------------------------------------------------------------------------</a>
+
+<a id="415" class="Keyword">module</a> <a id="422" href="Ledger.Prelude.html" class="Module">Ledger.Prelude</a> <a id="437" class="Keyword">where</a>
+
+<a id="444" class="Keyword">open</a> <a id="449" class="Keyword">import</a> <a id="456" href="Prelude.html" class="Module">Prelude</a> <a id="464" class="Keyword">public</a>
+
+<a id="472" class="Keyword">open</a> <a id="477" class="Keyword">import</a> <a id="484" href="Ledger.Prelude.Base.html" class="Module">Ledger.Prelude.Base</a> <a id="504" class="Keyword">public</a>
+
+<a id="512" class="Keyword">open</a> <a id="517" class="Keyword">import</a> <a id="524" href="Data.Product.Ext.html" class="Module">Data.Product.Ext</a> <a id="541" class="Keyword">public</a>
+<a id="548" class="Keyword">open</a> <a id="553" class="Keyword">import</a> <a id="560" href="Data.Maybe.Properties.Ext.html" class="Module">Data.Maybe.Properties.Ext</a> <a id="586" class="Keyword">public</a>
+<a id="593" class="Keyword">open</a> <a id="598" class="Keyword">import</a> <a id="605" href="Interface.Functor.html" class="Module">Interface.Functor</a> <a id="623" class="Keyword">public</a>
+<a id="630" class="Keyword">open</a> <a id="635" class="Keyword">import</a> <a id="642" href="Interface.Bifunctor.html" class="Module">Interface.Bifunctor</a> <a id="662" class="Keyword">public</a>
+<a id="669" class="Keyword">open</a> <a id="674" class="Keyword">import</a> <a id="681" href="Interface.DecEq.Ext.html" class="Module">Interface.DecEq.Ext</a> <a id="701" class="Keyword">public</a>
+<a id="708" class="Keyword">open</a> <a id="713" class="Keyword">import</a> <a id="720" href="Interface.HasAdd.html" class="Module">Interface.HasAdd</a> <a id="737" class="Keyword">public</a>
+<a id="744" class="Keyword">open</a> <a id="749" class="Keyword">import</a> <a id="756" href="Interface.HasAdd.Instance.html" class="Module">Interface.HasAdd.Instance</a> <a id="782" class="Keyword">public</a>
+<a id="789" class="Keyword">open</a> <a id="794" class="Keyword">import</a> <a id="801" href="Interface.HasSubtract.html" class="Module">Interface.HasSubtract</a> <a id="823" class="Keyword">public</a>
+<a id="830" class="Keyword">open</a> <a id="835" class="Keyword">import</a> <a id="842" href="Interface.HasSubtract.Instance.html" class="Module">Interface.HasSubtract.Instance</a> <a id="873" class="Keyword">public</a>
+<a id="880" class="Keyword">open</a> <a id="885" class="Keyword">import</a> <a id="892" href="Interface.HasOrder.html" class="Module">Interface.HasOrder</a> <a id="911" class="Keyword">public</a>
+<a id="918" class="Keyword">open</a> <a id="923" class="Keyword">import</a> <a id="930" href="Interface.HasOrder.Instance.html" class="Module">Interface.HasOrder.Instance</a> <a id="958" class="Keyword">public</a>
+<a id="965" class="Keyword">open</a> <a id="970" class="Keyword">import</a> <a id="977" href="Interface.Decidable.Instance.html" class="Module">Interface.Decidable.Instance</a> <a id="1006" class="Keyword">public</a>
+<a id="1013" class="Keyword">open</a> <a id="1018" class="Keyword">import</a> <a id="1025" href="Interface.Hashable.html" class="Module">Interface.Hashable</a> <a id="1044" class="Keyword">public</a>
+<a id="1051" class="Keyword">open</a> <a id="1056" class="Keyword">import</a> <a id="1063" href="Interface.ComputationalRelation.html" class="Module">Interface.ComputationalRelation</a> <a id="1095" class="Keyword">public</a>
+<a id="1102" class="Keyword">open</a> <a id="1107" class="Keyword">import</a> <a id="1114" href="MyDebugOptions.html" class="Module">MyDebugOptions</a> <a id="1129" class="Keyword">public</a>
+<a id="1136" class="Keyword">open</a> <a id="1141" class="Keyword">import</a> <a id="1148" href="Tactic.DeriveComp.html" class="Module">Tactic.DeriveComp</a> <a id="1166" class="Keyword">public</a>
+
+<a id="1174" class="Keyword">open</a> <a id="1179" class="Keyword">import</a> <a id="1186" href="Ledger.Interface.HasCoin.html" class="Module">Ledger.Interface.HasCoin</a> <a id="1211" class="Keyword">public</a>
+<a id="1218" class="Keyword">open</a> <a id="1223" class="Keyword">import</a> <a id="1230" href="Ledger.Set.html" class="Module">Ledger.Set</a> <a id="1241" class="Keyword">public</a>
+</pre></body></html>
